@@ -95,7 +95,7 @@ describe('Loader', function () {
     registerA(System);
     registerB(System);
     const p = await System.import('depB');
-    console.log(p);
+    expect(p.reExportedValue).toBe(21)
   });
 
 

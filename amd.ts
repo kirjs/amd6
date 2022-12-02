@@ -139,7 +139,7 @@ class System {
           } catch (e) {
             debugger
             console.log(e);
-            throw e;
+            return reject(e);
           }
 
           resolve(exports);
