@@ -10,6 +10,14 @@ import {
   umdExample
 } from "./data";
 import { readFileSync } from "fs";
+import {
+    registerChildComponent,
+    registerComponentA,
+    registerComponentB,
+    registerIndex,
+    registerUtils
+} from './relative-import-data';
+import {isObservable} from 'rxjs';
 
 
 function createFakeFetcher() {
@@ -144,5 +152,38 @@ describe('Loader', function () {
     cleanUp();
   });
 
+  it('resolve relative deps', async () => {
+    const {System, fetcher} = setup();
+    fetcher.set('https://angul.ar/rxjs', readFileSync('./bundles/rxjs.js', 'utf-8'));
+    System.addImportMap({
+        imports: {
+            'rxjs': 'https://angul.ar/rxjs',
+        }
+    });
 
+    registerIndex(System);
+    registerComponentA(System);
+    registerComponentB(System);
+    registerChildComponent(System);
+    registerUtils(System);
+
+    const componentAWrapper = await System.import('componentA');
+    expect(componentAWrapper.ComponentA).toStrictEqual(expect.any(Function));
+
+    const componentBWrapper = await System.import('componentB');
+    expect(componentBWrapper.ComponentB).toStrictEqual(expect.any(Function));
+
+    const componentB = new componentBWrapper.ComponentB();
+
+    expect(isObservable(componentB.stream$)).toBe(true);
+
+    const childComponentWrapper = await System.import('child-component');
+    expect(childComponentWrapper.ChildComponent).toStrictEqual(expect.any(Function));
+
+    const childComponent = new childComponentWrapper.ChildComponent()
+    expect(childComponent.utilsValue).toBe('123');
+
+    const utilsWrapper = await System.import('utils');
+    expect(utilsWrapper.utils).toBe('123');
+  })
 });

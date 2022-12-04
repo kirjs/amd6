@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "module": "system",
+    "target": "ES2015",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true
+  },
+  "files": [
+    "index.ts"
+  ],
+  "exclude": [
+    "data.ts"
+  ]
+}

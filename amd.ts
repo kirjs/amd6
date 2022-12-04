@@ -44,8 +44,10 @@ class System {
   }
 
   normalize(id: string) {
-    // TODO(kirjs): Actually normalize
-    return id.replace('./', '');
+    if (this.modules[id] || this.importsMap.imports[id]) {
+      return id;
+    }
+    return id.split('/').slice(-1)[0];
   }
 
   async getModule(id: string) {
