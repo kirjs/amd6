@@ -6,7 +6,8 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "skipLibCheck": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "esModuleInterop": true
   },
   "files": [
     "amd.ts",
