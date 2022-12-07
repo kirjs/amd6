@@ -43,15 +43,7 @@ class System {
     return this.modules[id] = Promise.resolve([deps, func]);
   }
 
-  normalize(id: string) {
-    if (this.modules[id] || this.importsMap.imports[id]) {
-      return id;
-    }
-    return id.split('/').slice(-1)[0];
-  }
-
   async getModule(id: string) {
-    id = this.normalize(id);
     const module = await this.modules[id];
 
     if (module) {
@@ -71,7 +63,6 @@ class System {
 
   async resolveExports(...ids: string[]) {
     return Promise.all(ids.map(async id => {
-        id = this.normalize(id);
         if (this.resolvedExports[id]) {
           return await this.resolvedExports[id];
         }
@@ -85,13 +76,13 @@ class System {
 
         return this.resolvedExports[id] = new Promise(async (resolve, reject) => {
           if (!mod) {
-            throw new Error("can't fetch module: " + id);
+            return reject(new Error("can't fetch module: " + id));
           }
 
           const [deps, func] = mod;
 
           function $__export(key: string, value: unknown) {
-            exports[key] = value;
+            return exports[key] = value;
           }
 
           const $__moduleContext = {id};
@@ -105,8 +96,7 @@ class System {
             }
             resolve({setters, execute, exports});
           } catch (e) {
-            console.log(e);
-            throw e;
+            return reject(e);
           }
         });
 
@@ -116,7 +106,6 @@ class System {
 
   async executeDeps(...ids: string[]) {
     return Promise.all(ids.map(async id => {
-        id = this.normalize(id);
         if (this.executedDeps[id]) {
           return this.executedDeps[id];
         }
@@ -139,8 +128,6 @@ class System {
           try {
             await execute();
           } catch (e) {
-            debugger
-            console.log(e);
             return reject(e);
           }
 
